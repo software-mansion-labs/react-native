@@ -53,7 +53,23 @@ runs:
         # An unset SIM_ROUTER_URL secret arrives as an empty env var, which
         # would override the router URL baked into the binary — drop it.
         [ -n "${SIM_ROUTER_URL:-}" ] || unset SIM_ROUTER_URL
-        sim-remote login --timeout 900
+
+        sim-remote login --no-acquire
+
+        # The router clamps a single acquire wait to 300s server-side
+        # (DEFAULT_ACQUIRE_MAX_WAIT_SECS), so a longer --timeout is silently
+        # truncated. Retry instead, to ride out contention when another job
+        # (ours or someone else's) is holding the fleet.
+        for attempt in $(seq 1 8); do
+          if sim-remote acquire --timeout 300; then
+            exit 0
+          fi
+          echo "Attempt $attempt: no fleet machine available yet, retrying..."
+          sleep 30
+        done
+
+        echo "Could not acquire a fleet machine" >&2
+        exit 1
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:

@@ -25,6 +25,8 @@ jobs:
       status: ${{ steps.report-status.outputs.status }}
     strategy:
       fail-fast: false
+      # One fleet machine at a time: flavors would otherwise starve each other.
+      max-parallel: 1
       matrix:
         flavor: [Debug, Release]
     steps:

@@ -70,12 +70,22 @@ jobs:
     secrets: inherit
 
   test_e2e_ios_templateapp:
+    # Also waits on the rntester E2E: both drive remote simulators, and the
+    # fleet does not have enough machines to serve them at the same time.
     needs:
       [
         build_npm_package,
         prebuild_apple_dependencies,
         prebuild_react_native_core,
+        test_e2e_ios_rntester,
       ]
+    # rntester is a sequencing dependency only — run even when it reports
+    # failing flows, so one dispatch gives signal on both suites.
+    if: |
+      !cancelled() &&
+      needs.build_npm_package.result == 'success' &&
+      needs.prebuild_apple_dependencies.result == 'success' &&
+      needs.prebuild_react_native_core.result == 'success'
     uses: ./.github/workflows/e2e-ios-templateapp.yml
     with:
       fail-on-error: true
