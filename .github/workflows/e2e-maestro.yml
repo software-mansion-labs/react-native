@@ -25,7 +25,7 @@ jobs:
   # Builds RNTester and uploads the RNTesterApp-NewArch-<flavor> artifacts
   # consumed by e2e-ios-rntester.yml (run-unit-tests defaults to false).
   build_rntester_app:
-    runs-on: macos-15-large
+    runs-on: macos-15
     needs: [prebuild_apple_dependencies, prebuild_react_native_core]
     strategy:
       fail-fast: false
@@ -42,7 +42,7 @@ jobs:
 
   # Builds the react-native .tgz (dry-run) consumed by e2e-ios-templateapp.yml.
   build_npm_package:
-    runs-on: 8-core-ubuntu
+    runs-on: ubuntu-latest
     needs: [prebuild_apple_dependencies, prebuild_react_native_core]
     container:
       image: reactnativecommunity/react-native-android:latest

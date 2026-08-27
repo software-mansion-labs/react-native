@@ -18,7 +18,7 @@ jobs:
   # Building the app needs Xcode, so it stays on a macOS runner. The E2E run
   # itself drives a remote simulator via sim-remote, so it runs on Linux.
   build:
-    runs-on: macos-26-large
+    runs-on: macos-26
     strategy:
       fail-fast: false
       matrix:
