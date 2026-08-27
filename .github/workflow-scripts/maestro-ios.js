@@ -32,10 +32,12 @@ function findAvailableSimulator() {
   const devices = Object.values(JSON.parse(String(output)).devices)
     .flat()
     .reverse();
-  const simulator = devices.find(device => /^iPhone .* Pro$/.test(device.name));
+  const simulator =
+    devices.find(device => /^iPhone .* Pro$/.test(device.name)) ??
+    devices.find(device => /^iPhone /.test(device.name));
 
   if (simulator == null) {
-    throw new Error('Unable to find an available iPhone Pro simulator');
+    throw new Error('Unable to find an available iPhone simulator');
   }
 
   return simulator;
@@ -54,9 +56,26 @@ function launchSimulator(simulator) {
   }
 }
 
-function installAppOnSimulator(appPath) {
+function installAppOnSimulator(appPath, udid) {
   console.log(`Installing app at path ${appPath}`);
-  childProcess.execSync(`xcrun simctl install booted "${appPath}"`);
+  childProcess.execSync(`xcrun simctl install "${udid}" "${appPath}"`);
+}
+
+// When running against a remote simulator through the sim-remote Maestro
+// shims (`sim-remote install-shims` exports SIM_REMOTE_BIN), localhost inside
+// the simulator is the remote host, not this machine — so the app cannot
+// reach the local Metro server on its own. A reverse tunnel exposes the local
+// Metro port to the simulator via localhost.
+function exposeMetroToSimulator(udid) {
+  const simRemote = process.env.SIM_REMOTE_BIN;
+  if (!simRemote) {
+    return;
+  }
+
+  console.log('Exposing local Metro port 8081 to the remote simulator');
+  childProcess.execSync(`"${simRemote}" reverse start "${udid}" 8081`, {
+    stdio: 'inherit',
+  });
 }
 
 function bringSimulatorInForeground() {
@@ -80,13 +99,13 @@ async function launchAppOnSimulator(appId, udid, isDebug) {
   }
 }
 
-function startVideoRecording(jsengine, currentAttempt) {
+function startVideoRecording(udid, currentAttempt) {
   console.log(
     `Start video record using pid: video_record_${currentAttempt}.pid`,
   );
 
   const recordingArgs =
-    `simctl io booted recordVideo --force video_record_${currentAttempt}.mov`.split(
+    `simctl io ${udid} recordVideo --force video_record_${currentAttempt}.mov`.split(
       ' ',
     );
   const recordingProcess = childProcess.spawn('xcrun', recordingArgs, {
@@ -109,7 +128,7 @@ function stopVideoRecording(recordingProcess) {
 }
 
 function executeFlowWithRetries(appId, udid, flow, jsengine, currentAttempt) {
-  const recProcess = startVideoRecording(jsengine, currentAttempt);
+  const recProcess = startVideoRecording(udid, currentAttempt);
   try {
     const timeout = 1000 * 60 * 10; // 10 minutes
     const command = `$HOME/.maestro/bin/maestro --udid="${udid}" test "${flow}" --format junit -e APP_ID="${appId}"`;
@@ -176,8 +195,11 @@ async function main(args = process.argv.slice(2)) {
 
   const simulator = findAvailableSimulator();
   launchSimulator(simulator);
-  installAppOnSimulator(appPath);
+  installAppOnSimulator(appPath, simulator.udid);
   bringSimulatorInForeground();
+  if (isDebug) {
+    exposeMetroToSimulator(simulator.udid);
+  }
   await launchAppOnSimulator(appId, simulator.udid, isDebug);
   executeFlows(appId, simulator.udid, maestroFlow, jsengine);
   console.log('Test finished');
