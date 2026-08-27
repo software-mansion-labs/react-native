@@ -1,8 +1,7 @@
 name: On Issue Labeled
 # This workflow is triggered when a label is added to an issue.
 on:
-  issues:
-    types: [labeled]
+  workflow_dispatch:
 
 permissions:
   contents: write

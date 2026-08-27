@@ -1,7 +1,7 @@
 name: Stale bot
 on:
-  schedule:
-    - cron: '*/10 5 * * *'
+  workflow_dispatch:
+
 jobs:
   stale:
     runs-on: ubuntu-latest
