@@ -14,6 +14,10 @@ appId: ${APP_ID}
       id: 'ScrollViewMaintainVisibleContentPositionExample'
     direction: DOWN
     speed: 80
+    # The example sits far down the list, and driving a remote
+    # simulator adds latency to every scroll — the default timeout
+    # is not enough to reach it.
+    timeout: 90000
 - tapOn:
     id: 'ScrollViewMaintainVisibleContentPositionExample'
 - waitForAnimationToEnd:
