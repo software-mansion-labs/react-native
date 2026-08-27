@@ -45,6 +45,16 @@ runs:
           "https://github.com/software-mansion/sim-remote-releases/releases/download/softu/sim-remote-${TARGET}"
         chmod +x "$HOME/.local/bin/sim-remote"
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+        # `softu` is a rolling tag: it has been rebuilt from a tree without the
+        # Maestro shims before, which otherwise only surfaces later as a
+        # confusing mid-test failure. Fail here, with the reason.
+        if ! "$HOME/.local/bin/sim-remote" install-shims --help >/dev/null 2>&1; then
+          echo "The sim-remote build at the 'softu' tag has no 'install-shims' command," >&2
+          echo "so Maestro cannot drive a remote simulator. Rebuild the tag from a tree" >&2
+          echo "that includes the Maestro shims (software-mansion/radon-cloud#143)." >&2
+          exit 1
+        fi
     - name: Acquire remote simulator
       shell: bash
       # Credentials come from the calling job's env:
