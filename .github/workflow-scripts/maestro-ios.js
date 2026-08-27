@@ -168,6 +168,12 @@ function executeFlows(appId, udid, maestroFlow, jsengine) {
   for (const file of fs.readdirSync(maestroFlow).sort()) {
     const filePath = `${maestroFlow.replace(/\/$/, '')}/${file}`;
     if (fs.lstatSync(filePath).isDirectory()) {
+      // `helpers/` holds fragments that other flows pull in with `runFlow`.
+      // They have no `launchApp` and assume the app is already on a given
+      // screen, so running them standalone fails on leftover state.
+      if (file === 'helpers') {
+        continue;
+      }
       executeFlows(appId, udid, filePath, jsengine);
     } else if (file.endsWith('.yml') || file.endsWith('.yaml')) {
       executeFlowWithRetries(appId, udid, filePath, jsengine, 1);
