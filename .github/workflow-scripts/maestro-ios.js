@@ -79,6 +79,10 @@ function exposeMetroToSimulator(udid) {
 }
 
 function bringSimulatorInForeground() {
+  if (process.env.SIM_REMOTE_BIN) {
+    // A remote simulator has no local GUI to bring forward.
+    return;
+  }
   console.log('Bringing simulator in foreground');
   childProcess.execSync('open -a simulator');
 }
