@@ -69,10 +69,8 @@ jobs:
       fail-on-error: true
     secrets: inherit
 
-  # Runs alongside the rntester E2E. Every flavor of both suites runs
-  # concurrently, so a dispatch wants four fleet machines at once; jobs that
-  # cannot get one immediately wait on the acquire retry in the maestro-ios
-  # action rather than failing.
+  # Every flavor of both suites runs at once: a dispatch wants four fleet
+  # machines, and waits on the acquire retry when they are not free.
   test_e2e_ios_templateapp:
     needs:
       [

@@ -46,9 +46,7 @@ runs:
         chmod +x "$HOME/.local/bin/sim-remote"
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-        # `softu` is a rolling tag: it has been rebuilt from a tree without the
-        # Maestro shims before, which otherwise only surfaces later as a
-        # confusing mid-test failure. Fail here, with the reason.
+        # `softu` is a rolling tag and has been rebuilt without the shims before.
         if ! "$HOME/.local/bin/sim-remote" install-shims --help >/dev/null 2>&1; then
           echo "The sim-remote build at the 'softu' tag has no 'install-shims' command," >&2
           echo "so Maestro cannot drive a remote simulator. Rebuild the tag from a tree" >&2
@@ -66,10 +64,8 @@ runs:
 
         sim-remote login --no-acquire
 
-        # The router clamps a single acquire wait to 300s server-side
-        # (DEFAULT_ACQUIRE_MAX_WAIT_SECS), so a longer --timeout is silently
-        # truncated. Retry instead, to ride out contention when another job
-        # (ours or someone else's) is holding the fleet.
+        # The router clamps a single acquire wait to 300s, so retry rather than
+        # asking for a longer timeout that is silently truncated.
         for attempt in $(seq 1 8); do
           if sim-remote acquire --timeout 300; then
             exit 0

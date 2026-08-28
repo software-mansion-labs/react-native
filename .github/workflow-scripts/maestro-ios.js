@@ -61,11 +61,7 @@ function installAppOnSimulator(appPath, udid) {
   childProcess.execSync(`xcrun simctl install "${udid}" "${appPath}"`);
 }
 
-// When running against a remote simulator through the sim-remote Maestro
-// shims (`sim-remote install-shims` exports SIM_REMOTE_BIN), localhost inside
-// the simulator is the remote host, not this machine — so the app cannot
-// reach the local Metro server on its own. A reverse tunnel exposes the local
-// Metro port to the simulator via localhost.
+// A remote simulator's localhost is the remote host, so Metro needs a tunnel.
 function exposeMetroToSimulator(udid) {
   const simRemote = process.env.SIM_REMOTE_BIN;
   if (!simRemote) {
@@ -79,8 +75,8 @@ function exposeMetroToSimulator(udid) {
 }
 
 function bringSimulatorInForeground() {
+  // Nothing to foreground on a remote simulator.
   if (process.env.SIM_REMOTE_BIN) {
-    // A remote simulator has no local GUI to bring forward.
     return;
   }
   console.log('Bringing simulator in foreground');
@@ -120,9 +116,7 @@ function startVideoRecording(udid, currentAttempt) {
   return recordingProcess;
 }
 
-// How long to let the recorder finalize the movie before giving up on it.
-// simctl (and sim-remote, which additionally downloads the file) writes it
-// only after SIGINT, so returning early truncates the video.
+// The movie is only written after SIGINT, so returning early truncates it.
 const RECORDING_SHUTDOWN_TIMEOUT_MS = 30 * 1000;
 
 function stopVideoRecording(recordingProcess) {
@@ -140,9 +134,8 @@ function stopVideoRecording(recordingProcess) {
     return Promise.resolve();
   }
 
-  // Waiting for the exit is what reaps the child: the flows run in a
-  // synchronous loop, so without turning the event loop here every recorder
-  // lingers as a zombie for the whole suite.
+  // Awaiting the exit is also what reaps the child: the flows run in a
+  // synchronous loop, so nothing else turns the event loop.
   return new Promise(resolve => {
     const done = () => {
       clearTimeout(timer);
@@ -211,9 +204,8 @@ async function executeFlows(appId, udid, maestroFlow, jsengine) {
   for (const file of fs.readdirSync(maestroFlow).sort()) {
     const filePath = `${maestroFlow.replace(/\/$/, '')}/${file}`;
     if (fs.lstatSync(filePath).isDirectory()) {
-      // `helpers/` holds fragments that other flows pull in with `runFlow`.
-      // They have no `launchApp` and assume the app is already on a given
-      // screen, so running them standalone fails on leftover state.
+      // Fragments pulled in via `runFlow`; they have no `launchApp` of their
+      // own and fail when run standalone.
       if (file === 'helpers') {
         continue;
       }

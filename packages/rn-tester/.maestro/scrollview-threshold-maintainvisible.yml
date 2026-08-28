@@ -14,9 +14,8 @@ appId: ${APP_ID}
       id: 'ScrollViewMaintainVisibleContentPositionExample'
     direction: DOWN
     speed: 80
-    # The example sits far down the list, and driving a remote
-    # simulator adds latency to every scroll — the default timeout
-    # is not enough to reach it.
+    # Each scroll step ships the whole accessibility tree over the wire
+    # against a remote simulator, which the default timeout cannot absorb.
     timeout: 90000
 - tapOn:
     id: 'ScrollViewMaintainVisibleContentPositionExample'
