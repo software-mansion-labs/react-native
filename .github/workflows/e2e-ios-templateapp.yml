@@ -109,9 +109,6 @@ jobs:
       status: ${{ steps.report-status.outputs.status }}
     strategy:
       fail-fast: false
-      # One fleet machine at a time per suite: the flavors would otherwise
-      # starve each other, and the other E2E suite runs alongside this one.
-      max-parallel: 1
       matrix:
         flavor: [Debug, Release]
     steps:
