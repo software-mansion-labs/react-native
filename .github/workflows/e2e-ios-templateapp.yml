@@ -98,7 +98,7 @@ jobs:
 
   test:
     needs: build
-    runs-on: macos-26-large
+    runs-on: macos-26
     outputs:
       status: ${{ steps.report-status.outputs.status }}
     strategy:
