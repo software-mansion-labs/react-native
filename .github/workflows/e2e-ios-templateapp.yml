@@ -15,8 +15,6 @@ on:
         value: ${{ jobs.report.outputs.status }}
 
 jobs:
-  # Building the app needs Xcode, so it stays on a macOS runner. The E2E run
-  # itself drives a remote simulator via sim-remote, so it runs on Linux.
   build:
     runs-on: macos-26
     strategy:
@@ -100,11 +98,7 @@ jobs:
 
   test:
     needs: build
-    runs-on: ubuntu-latest
-    env:
-      SIM_ROUTER_URL: ${{ secrets.SIM_ROUTER_URL }}
-      SIM_ROUTER_USERNAME: ${{ vars.SIM_ROUTER_USERNAME }}
-      SIM_ROUTER_API_KEY: ${{ secrets.SIM_ROUTER_API_KEY }}
+    runs-on: macos-26-large
     outputs:
       status: ${{ steps.report-status.outputs.status }}
     strategy:

@@ -16,11 +16,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    env:
-      SIM_ROUTER_URL: ${{ secrets.SIM_ROUTER_URL }}
-      SIM_ROUTER_USERNAME: ${{ vars.SIM_ROUTER_USERNAME }}
-      SIM_ROUTER_API_KEY: ${{ secrets.SIM_ROUTER_API_KEY }}
+    runs-on: macos-26-large
     outputs:
       status: ${{ steps.report-status.outputs.status }}
     strategy:

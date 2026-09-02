@@ -69,8 +69,6 @@ jobs:
       fail-on-error: true
     secrets: inherit
 
-  # Every flavor of both suites runs at once: a dispatch wants four fleet
-  # machines, and waits on the acquire retry when they are not free.
   test_e2e_ios_templateapp:
     needs:
       [

@@ -1,5 +1,5 @@
 name: Maestro E2E iOS
-description: Runs E2E Tests on iOS using Maestro against a remote simulator via sim-remote
+description: Runs E2E Tests on iOS using Maestro
 inputs:
   app-path:
     required: true
@@ -27,55 +27,9 @@ runs:
       run: export MAESTRO_VERSION=2.6.1; curl -Ls "https://get.maestro.mobile.dev" | bash
     - name: Installing Maestro dependencies
       shell: bash
-      # libplist-utils provides plistutil, which backs the sim-remote plutil
-      # shim (Maestro pipes `simctl listapps` output through `plutil`).
       run: |
-        sudo apt-get update
-        sudo apt-get install -y libplist-utils
-    - name: Install sim-remote
-      shell: bash
-      run: |
-        case "$(uname -m)" in
-          x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
-          aarch64 | arm64) TARGET="aarch64-unknown-linux-gnu" ;;
-          *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;;
-        esac
-        mkdir -p "$HOME/.local/bin"
-        curl -fL --retry 3 -o "$HOME/.local/bin/sim-remote" \
-          "https://github.com/software-mansion/sim-remote-releases/releases/download/softu/sim-remote-${TARGET}"
-        chmod +x "$HOME/.local/bin/sim-remote"
-        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-        # `softu` is a rolling tag and has been rebuilt without the shims before.
-        if ! "$HOME/.local/bin/sim-remote" install-shims --help >/dev/null 2>&1; then
-          echo "The sim-remote build at the 'softu' tag has no 'install-shims' command," >&2
-          echo "so Maestro cannot drive a remote simulator. Rebuild the tag from a tree" >&2
-          echo "that includes the Maestro shims (software-mansion/radon-cloud#143)." >&2
-          exit 1
-        fi
-    - name: Acquire remote simulator
-      shell: bash
-      # Credentials come from the calling job's env:
-      # SIM_ROUTER_URL, SIM_ROUTER_USERNAME, SIM_ROUTER_API_KEY.
-      run: |
-        # An unset SIM_ROUTER_URL secret arrives as an empty env var, which
-        # would override the router URL baked into the binary — drop it.
-        [ -n "${SIM_ROUTER_URL:-}" ] || unset SIM_ROUTER_URL
-
-        sim-remote login --no-acquire
-
-        # The router clamps a single acquire wait to 300s, so retry rather than
-        # asking for a longer timeout that is silently truncated.
-        for attempt in $(seq 1 8); do
-          if sim-remote acquire --timeout 300; then
-            exit 0
-          fi
-          echo "Attempt $attempt: no fleet machine available yet, retrying..."
-          sleep 30
-        done
-
-        echo "Could not acquire a fleet machine" >&2
-        exit 1
+        brew tap facebook/fb
+        brew install facebook/fb/idb-companion
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:
@@ -99,10 +53,6 @@ runs:
       id: run-tests
       shell: bash
       run: |
-        # Put the Maestro shims (xcrun, xcodebuild, plutil, ...) on PATH so
-        # stock Maestro drives the remote simulator through sim-remote.
-        eval "$(sim-remote install-shims)"
-
         # Avoid exit from the job if one of the command returns an error.
         # Maestro can fail in case of flakyness, we have some retry logic.
         set +e
@@ -114,10 +64,6 @@ runs:
           "Hermes" \
           "${{ inputs.flavor }}" \
           "${{ inputs.working-directory }}"
-    - name: Release remote simulator
-      if: ${{ always() }}
-      shell: bash
-      run: sim-remote logout || true
     - name: Store video record
       if: always()
       uses: actions/upload-artifact@v6
