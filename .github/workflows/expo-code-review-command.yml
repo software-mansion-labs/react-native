@@ -10,10 +10,10 @@ name: AI code review (command)
 # policy in .expo-code-review/config.jsonc and the `ai-review:skip` label.
 
 on:
-  issue_comment:
-    types: [created]
+  workflow_dispatch:
 
 # Comment-only: read the repo, write PR comments (issue comments API).
+
 permissions:
   contents: read
   pull-requests: write
