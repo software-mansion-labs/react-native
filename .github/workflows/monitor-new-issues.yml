@@ -1,8 +1,6 @@
 name: Monitor React Native New Issues
 
 on:
-  schedule:
-    - cron: '0 0,6,12,18 * * *'
   workflow_dispatch:
 
 # Reminder for when we have to update the schedule (before Jan 2026):
