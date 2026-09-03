@@ -18,7 +18,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      SIM_ROUTER_URL: ${{ secrets.SIM_ROUTER_URL }}
+      # SIM_ROUTER_URL is deliberately absent: an unset secret arrives as an
+      # empty *string*, and the acquire action's process.env merge does not
+      # clear an already-empty inherited var, which makes sim-remote's HTTP
+      # client builder fail on "" rather than falling back to its baked-in
+      # default. Only set this if the router URL secret is actually populated.
       SIM_ROUTER_USERNAME: ${{ vars.SIM_ROUTER_USERNAME }}
       SIM_ROUTER_API_KEY: ${{ secrets.SIM_ROUTER_API_KEY }}
     outputs:
