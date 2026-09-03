@@ -1,5 +1,6 @@
 name: Label closed PR as merged and leave a comment
-on: push
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read
