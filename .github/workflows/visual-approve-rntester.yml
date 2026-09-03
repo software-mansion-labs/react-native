@@ -5,8 +5,7 @@
 name: Visual Approve RNTester
 
 on:
-  pull_request_target:
-    types: [labeled, unlabeled]
+  workflow_dispatch:
 
 permissions:
   contents: read
