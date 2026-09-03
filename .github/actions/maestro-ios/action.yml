@@ -26,13 +26,13 @@ runs:
       shell: bash
       run: export MAESTRO_VERSION=2.6.1; curl -Ls "https://get.maestro.mobile.dev" | bash
     - name: Install sim-remote
-      uses: software-mansion-labs/argent-cloud-actions/install@v1
+      uses: software-mansion-labs/argent-cloud-actions/install@d2e23bc7607bb328a6df2dec916585fccca5d55f
       with:
         version: softu
     - name: Acquire remote simulator
       # Credentials come from the calling job's env. The machine is released
       # by the action's post step, even if the job fails or is cancelled.
-      uses: software-mansion-labs/argent-cloud-actions/acquire@v1
+      uses: software-mansion-labs/argent-cloud-actions/acquire@d2e23bc7607bb328a6df2dec916585fccca5d55f
       with:
         username: ${{ env.SIM_ROUTER_USERNAME }}
         api-key: ${{ env.SIM_ROUTER_API_KEY }}
@@ -58,7 +58,7 @@ runs:
     - name: Install Maestro shims
       # Puts xcrun, xcodebuild, plutil, ... stand-ins on PATH so stock Maestro
       # drives the remote simulator, and exports SIM_REMOTE_BIN for the script.
-      uses: software-mansion-labs/argent-cloud-actions/maestro-shims@v1
+      uses: software-mansion-labs/argent-cloud-actions/maestro-shims@d2e23bc7607bb328a6df2dec916585fccca5d55f
     - name: Run tests
       id: run-tests
       shell: bash
