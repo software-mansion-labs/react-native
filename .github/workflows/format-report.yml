@@ -1,9 +1,7 @@
 name: Format Report
 
 on:
-  workflow_run:
-    workflows: [Format]
-    types: [completed]
+  workflow_dispatch:
 
 permissions:
   actions: read

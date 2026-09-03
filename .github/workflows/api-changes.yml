@@ -1,8 +1,7 @@
 name: Analyze API Changes
 
 on:
-  pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+  workflow_dispatch:
 
 permissions:
   pull-requests: write

@@ -2,10 +2,10 @@
 name: AI code review
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
 
 # Comment-only: read the repo, write PR comments (issue comments API).
+
 permissions:
   contents: read
   pull-requests: write

@@ -15,17 +15,7 @@
 name: Publish to npm
 
 on:
-  push:
-    tags:
-      - 'v0.*.*' # This should match v0.X.Y
-      - 'v0.*.*-rc.*' # This should match v0.X.Y-RC.0
-    branches:
-      - 'main'
-      - '*-stable'
   workflow_dispatch:
-  # nightly build @ 2:15 AM UTC
-  schedule:
-    - cron: '15 2 * * *'
 
 permissions:
   contents: read
