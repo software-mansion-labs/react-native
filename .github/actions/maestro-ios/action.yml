@@ -1,5 +1,5 @@
 name: Maestro E2E iOS
-description: Runs E2E Tests on iOS using Maestro
+description: Runs E2E Tests on iOS using Maestro against a remote simulator via sim-remote
 inputs:
   app-path:
     required: true
@@ -25,11 +25,18 @@ runs:
     - name: Installing Maestro
       shell: bash
       run: export MAESTRO_VERSION=2.6.1; curl -Ls "https://get.maestro.mobile.dev" | bash
-    - name: Installing Maestro dependencies
-      shell: bash
-      run: |
-        brew tap facebook/fb
-        brew install facebook/fb/idb-companion
+    - name: Install sim-remote
+      uses: software-mansion-labs/argent-cloud-actions/install@v1
+      with:
+        version: softu
+    - name: Acquire remote simulator
+      # Credentials come from the calling job's env. The machine is released
+      # by the action's post step, even if the job fails or is cancelled.
+      uses: software-mansion-labs/argent-cloud-actions/acquire@v1
+      with:
+        username: ${{ env.SIM_ROUTER_USERNAME }}
+        api-key: ${{ env.SIM_ROUTER_API_KEY }}
+        router-url: ${{ env.SIM_ROUTER_URL }}
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:
@@ -49,6 +56,10 @@ runs:
         cd ${{ inputs.working-directory }}
         yarn start &
         sleep 5 # to give metro time to load
+    - name: Install Maestro shims
+      # Puts xcrun, xcodebuild, plutil, ... stand-ins on PATH so stock Maestro
+      # drives the remote simulator, and exports SIM_REMOTE_BIN for the script.
+      uses: software-mansion-labs/argent-cloud-actions/maestro-shims@v1
     - name: Run tests
       id: run-tests
       shell: bash
