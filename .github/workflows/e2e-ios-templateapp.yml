@@ -103,7 +103,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      SIM_ROUTER_URL: ${{ secrets.SIM_ROUTER_URL }}
       SIM_ROUTER_API_KEY: ${{ secrets.SIM_ROUTER_API_KEY }}
     outputs:
       status: ${{ steps.report-status.outputs.status }}
