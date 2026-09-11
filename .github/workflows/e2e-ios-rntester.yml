@@ -47,7 +47,7 @@ jobs:
           maestro-flow: ./packages/rn-tester/.maestro/
           flavor: ${{ matrix.flavor }}
           device-model: iPhone-17-Pro
-          device-os: iOS-26-2
+          device-os: iOS-26-5
       - name: Report status
         id: report-status
         if: ${{ always() && steps.run-tests.outcome == 'failure' }}
