@@ -39,7 +39,7 @@ runs:
       # Logs in with the job's OIDC id token; released in the post step.
       uses: software-mansion-labs/argent-cloud-actions/acquire@v2
       with:
-        label: react-native-e2e
+        label: e2e-maestro
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:

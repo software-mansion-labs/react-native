@@ -18,7 +18,7 @@ on:
 jobs:
   # Building needs Xcode; the tests drive a remote simulator from Linux.
   build:
-    runs-on: macos-26-large
+    runs-on: macos-26
     strategy:
       fail-fast: false
       matrix:
