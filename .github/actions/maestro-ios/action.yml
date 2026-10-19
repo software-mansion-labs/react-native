@@ -35,11 +35,16 @@ runs:
       run: export MAESTRO_VERSION=2.6.1; curl -Ls "https://get.maestro.mobile.dev" | bash
     - name: Install sim-remote
       uses: software-mansion-labs/argent-cloud-actions/install@v2
+    - name: Resolve login label
+      # <owner>.<calling workflow file>, the name this job's workflow is registered under.
+      id: login
+      shell: bash
+      run: echo "label=${GITHUB_REPOSITORY_OWNER}.$(basename "${GITHUB_WORKFLOW_REF%%@*}" .yml)" >> "$GITHUB_OUTPUT"
     - name: Acquire remote simulator
       # Logs in with the job's OIDC id token; released in the post step.
       uses: software-mansion-labs/argent-cloud-actions/acquire@v2
       with:
-        label: react-native-e2e
+        label: ${{ steps.login.outputs.label }}
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:
