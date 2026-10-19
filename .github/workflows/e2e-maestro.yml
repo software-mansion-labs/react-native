@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  id-token: write
 
 jobs:
   prebuild_apple_dependencies:
