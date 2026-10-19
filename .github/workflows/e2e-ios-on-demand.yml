@@ -76,7 +76,7 @@ jobs:
       actions: read
       id-token: write
     with:
-      argent-label: facebook.e2e-ios-on-demand
+      argent-label: software-mansion-labs.e2e-ios-on-demand
       artifact-run-id: ${{ needs.request.outputs.run-id }}
       flows-ref: ${{ needs.request.outputs.head-sha }}
       fail-on-error: true
@@ -89,7 +89,7 @@ jobs:
       actions: read
       id-token: write
     with:
-      argent-label: facebook.e2e-ios-on-demand
+      argent-label: software-mansion-labs.e2e-ios-on-demand
       artifact-run-id: ${{ needs.request.outputs.run-id }}
       flows-ref: ${{ needs.request.outputs.head-sha }}
       fail-on-error: true
